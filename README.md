@@ -15,7 +15,7 @@ Copyright 2016 NPR. All rights reserved. No part of these materials may be repro
 
 ## What is this? <a id="what-is-this"></a>
 
-Armslist-analysis was made to clean and summarize data from [Armslist.com](http://www.armslist.com/), a site used as a marketplace for buying and selling guns.
+Armslist-analysis was made to clean and summarize data from [Armslist.com](http://www.armslist.com/), a site used as a marketplace for buying and selling guns. It can be used with the data scraped by NPR or in conjunction with the [Armslist scraper](http://github.com/nprapps/armslist-scraper).
 
 ## Assumptions <a id="assumptions"></a>
 
@@ -39,11 +39,11 @@ cd armslist-analysis
 
 ## Get the data <a id="get-data"></a>
 
-The data was scraped from the [Armslist.com](http://www.armslist.com/) website in a separate repo, the filename includes the date where the scraper was run
+The data was scraped from the [Armslist.com](http://www.armslist.com/) website in a separate repo, the filename includes the date where the scraper was run:
 
 [Dataset as of June 16th](http://apps.npr.org/armslist-analysis/armslist-listings-2016-06-16.csv)
 
-Place the dataset into the data folder
+Place the dataset into the data folder.
 
 ## Run the project <a id="run"></a>
 
