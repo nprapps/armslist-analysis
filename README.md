@@ -15,7 +15,7 @@ Copyright 2016 NPR. All rights reserved. No part of these materials may be repro
 
 ## What is this? <a id="what-is-this"></a>
 
-Armslist-analysis was made to clean and summarize data from Armslist.com, a site used as a marketplace for buying and selling guns.
+Armslist-analysis was made to clean and summarize data from [Armslist.com](http://www.armslist.com/), a site used as a marketplace for buying and selling guns.
 
 ## Assumptions <a id="assumptions"></a>
 
@@ -39,7 +39,7 @@ cd armslist-analysis
 
 ## Get the data <a id="get-data"></a>
 
-The data was scraped from the [armslist](armslist.com) website in a separate repo, the filename includes the date where the scraper was run
+The data was scraped from the [Armslist.com](http://www.armslist.com/) website in a separate repo, the filename includes the date where the scraper was run
 
 [Dataset as of June 16th](http://apps.npr.org/armslist-analysis/armslist-listings-2016-06-16.csv)
 
@@ -56,13 +56,15 @@ pip install –r requirements.txt
 
 The next script will try to geocode the data based on the city and state of each listing, we use [Nominatim geocoding service](http://wiki.openstreetmap.org/wiki/Nominatim) access through the [geopy](http://geopy.readthedocs.io/en/latest/#) library to perform that task.
 
-Sometimes the geocoding service is not accesible so we always cache and persist the geocoded locations not to repeat ourselves `data/geocoded-cache.csv`
-
 Run the script to clean and geocode the data:
 
 ```
 ./clean.py
 ```
+
+Sometimes the geocoding service is not accesible so we always cache and persist the geocoded locations not to repeat ourselves `data/geocoded-cache-nominatim.csv`
+
+Because on the original website some cities where not actually cities but could be thought more as regions, we did manually update some geolocations like `West PA, Pennsylvania` (15-20 manually updated).
 
 ## What to expect <a id="what-to-expect"></a>
 
