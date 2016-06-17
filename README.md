@@ -8,6 +8,7 @@ Copyright 2016 NPR. All rights reserved. No part of these materials may be repro
 * [Assumptions](#assumptions)
 * [Requirements](#requirements)
 * [Installation](#installation)
+* [Get the data](#get-data)
 * [Run the project](#run)
 * [What to expect](#what-to-expect)
 * [Postgres DB analysis](#db-analysis)
@@ -36,6 +37,14 @@ git clone git@github.com:nprapps/armslist-analysis.git
 cd armslist-analysis
 ```
 
+## Get the data <a id="get-data"></a>
+
+The data was scraped from the [armslist](armslist.com) website in a separate repo, the filename includes the date where the scraper was run
+
+[Dataset as of June 16th](http://apps.npr.org/armslist-analysis/armslist-listings-2016-06-16.csv)
+
+Place the dataset into the data folder
+
 ## Run the project <a id="run"></a>
 
 Create a virtual environment and install the requirements:
@@ -45,9 +54,9 @@ mkvirtualenv armslist-analysis
 pip install –r requirements.txt
 ```
 
-Then grab a dump of the armlist dataset in csv format and place it into the data folder
-
 The next script will try to geocode the data based on the city and state of each listing, we use [Nominatim geocoding service](http://wiki.openstreetmap.org/wiki/Nominatim) access through the [geopy](http://geopy.readthedocs.io/en/latest/#) library to perform that task.
+
+Sometimes the geocoding service is not accesible so we always cache and persist the geocoded locations not to repeat ourselves `data/geocoded-cache.csv`
 
 Run the script to clean and geocode the data:
 
@@ -57,12 +66,12 @@ Run the script to clean and geocode the data:
 
 ## What to expect <a id="what-to-expect"></a>
 
-The script will create an on-memory geocode cache to try to minimize the hits to the actual MAPBOX API.
+The script will create an on-memory geocode cache to try to minimize the hits to the actual Nominatim geocoding service API.
 
 Running script will make two csv files:
 
-* `data/listings-clean.csv` is the bulk of the data with geolocation included. Each row represents a listing and the associated details.
-* `data/geocoded-cache.csv` is the geocoded cache persisted to disk for future runs of the script
+* `data/listings-clean-nominatim.csv` is the bulk of the data with geolocation included. Each row represents a listing and the associated details.
+* `data/geocoded-cache-nominatim.csv` is the geocoded cache persisted to disk for future runs of the script
 
 ## Import to DB and summarize <a id="db-analysis"></a>
 
