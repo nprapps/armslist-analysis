@@ -10,6 +10,7 @@ Copyright 2016 NPR. All rights reserved. No part of these materials may be repro
 * [Installation](#installation)
 * [Run the project](#run)
 * [What to expect](#what-to-expect)
+* [Postgres DB analysis](#db-analysis)
 
 ## What is this? <a id="what-is-this"></a>
 
@@ -21,7 +22,6 @@ The following things are assumed to be true in this documentation.
 * You are running OSX.
 * You are using Python 2.7. (Probably the version that came OSX.)
 * You have virtualenv and virtualenvwrapper installed and working.
-* You have GNU Parallel installed -- a shell tool to execute multiple commands from standard input simultaneously.
 
 For more details on the technology stack used with the app-template, see our [development environment blog post](http://blog.apps.npr.org/2013/06/06/how-to-setup-a-developers-environment.html).
 
@@ -45,19 +45,9 @@ mkvirtualenv armslist-analysis
 pip install –r requirements.txt
 ```
 
-Then grab a dump of the armlist dataset in csv format place it into the data folder
+Then grab a dump of the armlist dataset in csv format and place it into the data folder
 
-The next script will try to geocode the data based on the city and state of each listing, we use [Mapbox Geocoding API](https://www.mapbox.com/geocoding/) to perform that task. Make sure that you have your MAPBOX_API_KEY in your envirorment vars.
-
-```
-nano ~/.bash_profile
-```
-
-Once the file has opened, insert the key
-
-```
-export MAPBOX_API_KEY=$YOUR_KEY
-```
+The next script will try to geocode the data based on the city and state of each listing, we use [Nominatim geocoding service](http://wiki.openstreetmap.org/wiki/Nominatim) access through the [geopy](http://geopy.readthedocs.io/en/latest/#) library to perform that task.
 
 Run the script to clean and geocode the data:
 
@@ -74,7 +64,7 @@ Running script will make two csv files:
 * `data/listings-clean.csv` is the bulk of the data with geolocation included. Each row represents a listing and the associated details.
 * `data/geocoded-cache.csv` is the geocoded cache persisted to disk for future runs of the script
 
-## Analysis
+## Import to DB and summarize <a id="db-analysis"></a>
 
 We created a script to insert the cleaned data into a Postgres database for further analysis
 
