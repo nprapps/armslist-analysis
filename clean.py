@@ -10,20 +10,22 @@ from time import sleep
 # GLOBAL SETTINGS
 cwd = os.path.dirname(__file__)
 INPUT_PATH = os.path.join(cwd, 'data')
-INPUT_FILE = 'listings-2016-06-16-0800'
+INPUT_FILE = 'armslist-listings-2016-06-16'
 CACHE_FILE = 'geocoded-cache-nominatim'
+STATE_FILE = 'states-normalized'
 OUTPUT_FILE = 'listings-clean-nominatim'
 HEADER = ["url", "post_id", "title", "listed_date", "price_str", "price_num",
-          "location", "city", "state", "description", "registered", "category",
+          "location", "city", "state", "state_ap", "state_usps", "description", "registered", "category",
           "manufacturer", "caliber", "action", "firearm_type", "party", "img",
           "geo_address", "latitude", "longitude"]
 CACHE_HEADER = ["address", "latitude", "longitude"]
 
 # LIMIT CONDITIONS FOR TESTING
 LIMIT = False
-LIMIT_SAMPLE = 500
+LIMIT_SAMPLE = 5000
 
 cache = {}
+states = {}
 
 
 def persist_cache():
@@ -37,6 +39,36 @@ def persist_cache():
         for k, v in cache.iteritems():
             row = {'address': k, 'latitude': v[1], 'longitude': v[0]}
             writer.writerow(row)
+
+
+def clean(row=None):
+    """
+    Clean dataset:
+        - Clean description
+        - Split Price into numeric or not
+        - Remove prefix for the date
+        - Normalize state
+    """
+    # Clean description
+    row['description'] = row['description'].replace("\n", "\\n")
+
+    # Clean listed date to insert into postgres
+    row['listed_date'] = row['listed_date'].replace("Listed On: ",
+                                                    "")
+    # Split numeric vs string prices
+    try:
+        row['price_num'] = int(row['price'].replace(",", ""))
+    except ValueError:
+        row['price_str'] = row['price']
+
+    # Normalize state
+    try:
+        state_norm = states[row['state']]
+        row['state_ap'] = state_norm[0]
+        row['state_usps'] = state_norm[1]
+    except KeyError:
+        print "did not find %s" % (row['state'])
+
 
 
 def format_address(row=None):
@@ -129,17 +161,8 @@ def process_armlist():
                 if LIMIT and (count >= LIMIT_SAMPLE):
                     break
 
-                # Clean description
-                row['description'] = row['description'].replace("\n", "\\n")
-                # Clean listed date to insert into postgres
-                row['listed_date'] = row['listed_date'].replace("Listed On: ",
-                                                                "")
-                # Split numeric vs string prices
-                try:
-                    row['price_num'] = int(row['price'].replace(",", ""))
-                except ValueError:
-                    row['price_str'] = row['price']
-
+                # Clean data
+                clean(row)
                 # Geocode
                 # geocode(row, geocoder)
                 geocode_nominatim(row, geocoder)
@@ -148,7 +171,20 @@ def process_armlist():
             print('finished processing {}.csv'.format(INPUT_FILE))
 
 
+def load_state_normalized():
+    """ State with AP and USPS abbreviations"""
+    try:
+        with open('%s/%s.csv' % (INPUT_PATH, STATE_FILE), 'r') as f:
+            reader = CSVKitDictReader(f)
+            for row in reader:
+                states[row['name']] = [row['ap'], row['usps']]
+    except IOError:
+        # No cache file found
+        pass
+
+
 def load_geocoded_cache():
+    """ Load persisted geocoded locations"""
     try:
         with open('%s/%s.csv' % (INPUT_PATH, CACHE_FILE), 'r') as f:
             reader = CSVKitDictReader(f)
@@ -161,6 +197,7 @@ def load_geocoded_cache():
 
 def run():
     try:
+        load_state_normalized()
         load_geocoded_cache()
         process_armlist()
     except Exception, e:

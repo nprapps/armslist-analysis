@@ -5,15 +5,6 @@ echo "Create database"
 dropdb --if-exists armslist
 createdb armslist
 
-# get index csv in the db
-echo "Import index to database"
-psql armslist -c "CREATE TABLE index (
-  url varchar,
-  state varchar,
-  timestamp timestamp
-);"
-psql armslist -c "COPY index FROM '`pwd`/data/index-2016-06-16-0800.csv' DELIMITER ',' CSV;"
-
 # get listings csv in the db
 echo "Import listings geocoded with nominatim to database"
 psql armslist -c "CREATE TABLE listings (
@@ -26,6 +17,8 @@ psql armslist -c "CREATE TABLE listings (
   location varchar,
   city varchar,
   state varchar,
+  state_ap varchar,
+  state_usps varchar,
   description varchar,
   registered boolean,
   category varchar,

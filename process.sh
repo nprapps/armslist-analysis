@@ -76,3 +76,10 @@ SELECT l.registered, COUNT(*) FROM listings l
 WHERE listed_date BETWEEN to_date('2016-06-12','YYYY-MM-DD') AND to_date('2016-06-15','YYYY-MM-DD')
 GROUP BY l.registered
 ) to '`pwd`/output/unregistered_listings_jun12_15.csv' WITH CSV HEADER;"
+
+echo "listings grouped by action jun12-jun15"
+psql armslist -c "COPY (
+SELECT l.action, COUNT(*) FROM listings l
+WHERE listed_date BETWEEN to_date('2016-06-12','YYYY-MM-DD') AND to_date('2016-06-15','YYYY-MM-DD')
+GROUP BY l.action
+) to '`pwd`/output/byaction_listings_jun12_15.csv' WITH CSV HEADER;"
