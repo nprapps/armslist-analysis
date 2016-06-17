@@ -15,7 +15,7 @@ Copyright 2016 NPR. All rights reserved. No part of these materials may be repro
 
 ## What is this? <a id="what-is-this"></a>
 
-Armslist-analysis was made to clean and summarize data from [Armslist.com](http://www.armslist.com/), a site used as a marketplace for buying and selling guns.
+Armslist-analysis was made to clean and summarize data from [Armslist.com](http://www.armslist.com/), a site used as a marketplace for buying and selling guns. It can be used with the data scraped by NPR or in conjunction with the [Armslist scraper](http://github.com/nprapps/armslist-scraper).
 
 ## Assumptions <a id="assumptions"></a>
 
