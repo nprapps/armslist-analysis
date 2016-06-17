@@ -1,2 +1,2 @@
 csvkit==0.9.1
-mapbox==0.9.0
+geopy==1.11.0

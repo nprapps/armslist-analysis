@@ -15,7 +15,7 @@ psql armslist -c "CREATE TABLE index (
 psql armslist -c "COPY index FROM '`pwd`/data/index-2016-06-16-0800.csv' DELIMITER ',' CSV;"
 
 # get listings csv in the db
-echo "Import listings to database"
+echo "Import listings geocoded with nominatim to database"
 psql armslist -c "CREATE TABLE listings (
   url varchar,
   post_id varchar,
@@ -39,4 +39,4 @@ psql armslist -c "CREATE TABLE listings (
   latitude decimal(9,6),
   longitude decimal(9,6)
 );"
-psql armslist -c "COPY listings FROM '`pwd`/data/listings-clean.csv' DELIMITER ',' CSV HEADER;"
+psql armslist -c "COPY listings FROM '`pwd`/data/listings-clean-nominatim.csv' DELIMITER ',' CSV HEADER;"

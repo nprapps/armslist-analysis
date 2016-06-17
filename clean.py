@@ -2,7 +2,8 @@
 # coding: utf-8
 import os
 from csvkit.py2 import CSVKitDictReader, CSVKitDictWriter
-from mapbox import Geocoder
+from geopy.exc import GeocoderServiceError
+from geopy.geocoders import Nominatim
 from time import sleep
 
 
@@ -10,8 +11,8 @@ from time import sleep
 cwd = os.path.dirname(__file__)
 INPUT_PATH = os.path.join(cwd, 'data')
 INPUT_FILE = 'listings-2016-06-16-0800'
-CACHE_FILE = 'geocoded-cache'
-OUTPUT_FILE = 'listings-clean'
+CACHE_FILE = 'geocoded-cache-nominatim'
+OUTPUT_FILE = 'listings-clean-nominatim'
 HEADER = ["url", "post_id", "title", "listed_date", "price_str", "price_num",
           "location", "city", "state", "description", "registered", "category",
           "manufacturer", "caliber", "action", "firearm_type", "party", "img",
@@ -20,10 +21,7 @@ CACHE_HEADER = ["address", "latitude", "longitude"]
 
 # LIMIT CONDITIONS FOR TESTING
 LIMIT = False
-LIMIT_SAMPLE = 5000
-
-# MAPBOX API KEY
-MAPBOX_API_KEY = os.environ.get('MAPBOX_API_KEY', 'key')
+LIMIT_SAMPLE = 500
 
 cache = {}
 
@@ -63,7 +61,7 @@ def format_address(row=None):
     return address
 
 
-def geocode(row=None, geocoder=None):
+def geocode_nominatim(row=None, geocoder=None):
     """geocode based on address"""
     # Check for places
     row['latitude'] = None
@@ -72,20 +70,28 @@ def geocode(row=None, geocoder=None):
     address = format_address(row)
     if address not in cache:
         # Give mapBox some rest
-        sleep(0.5)
-        geo_resp = geocoder.forward(address)
-        geo_data = geo_resp.geojson()
-        # If mapbox did not return results view response and leave blank
-        if not geo_data['features']:
-            print "address %s not found by mapbox" % address
-            print "location: %s, city: %s, state: %s" % (row['location'],
-                                                         row['city'],
-                                                         row['state'])
-            cache[address] = [None, None]
-            return
-        # Get the top hit
-        top_hit = geo_data['features'][0]
-        coordinates = top_hit['geometry']['coordinates']
+        sleep(2)
+        query = {'country': 'us'}
+        bits = address.split(',')
+        if (len(bits) > 1):
+            # State and city
+            query['city'] = bits[0].strip()
+            query['state'] = bits[1].strip()
+        else:
+            # Only state
+            query['state'] = address
+
+        try:
+            location = geocoder.geocode(query, exactly_one=True, timeout=2)
+        except GeocoderServiceError:
+            location = None
+
+        if location:
+            coordinates = [location.longitude, location.latitude]
+        else:
+            # If we did not find a location set to None and cache to avoid
+            # hitting the same error again
+            coordinates = [None, None]
     else:
         coordinates = cache[address]
 
@@ -106,7 +112,7 @@ def process_armlist():
         os.makedirs(OUTPUT_PATH)
 
     # Initialize geocoder
-    geocoder = Geocoder(access_token=MAPBOX_API_KEY)
+    geocoder = Nominatim()
 
     with open('%s/%s.csv' %
               (INPUT_PATH, OUTPUT_FILE), 'w') as fout:
@@ -118,7 +124,7 @@ def process_armlist():
             count = 0
             for row in reader:
                 count += 1
-                if count % 1000 == 0:
+                if count % 500 == 0:
                     print "processed %s records" % count
                 if LIMIT and (count >= LIMIT_SAMPLE):
                     break
@@ -135,13 +141,11 @@ def process_armlist():
                     row['price_str'] = row['price']
 
                 # Geocode
-                geocode(row, geocoder)
+                # geocode(row, geocoder)
+                geocode_nominatim(row, geocoder)
                 # Write to csv file
                 writer.writerow(row)
             print('finished processing {}.csv'.format(INPUT_FILE))
-
-    # Persist cache file to disk
-    persist_cache()
 
 
 def load_geocoded_cache():
@@ -156,8 +160,14 @@ def load_geocoded_cache():
 
 
 def run():
-    load_geocoded_cache()
-    process_armlist()
+    try:
+        load_geocoded_cache()
+        process_armlist()
+    except Exception, e:
+        print "An exception has occured %s" (e)
+    finally:
+        # Always persist cache file to disk
+        persist_cache()
 
 
 if __name__ == '__main__':
