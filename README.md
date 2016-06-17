@@ -39,11 +39,11 @@ cd armslist-analysis
 
 ## Get the data <a id="get-data"></a>
 
-The data was scraped from the [Armslist.com](http://www.armslist.com/) website in a separate repo, the filename includes the date where the scraper was run
+The data was scraped from the [Armslist.com](http://www.armslist.com/) website in a separate repo, the filename includes the date where the scraper was run:
 
 [Dataset as of June 16th](http://apps.npr.org/armslist-analysis/armslist-listings-2016-06-16.csv)
 
-Place the dataset into the data folder
+Place the dataset into the data folder.
 
 ## Run the project <a id="run"></a>
 
