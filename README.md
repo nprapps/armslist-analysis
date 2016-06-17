@@ -66,6 +66,8 @@ Sometimes the geocoding service is not accesible so we always cache and persist 
 
 Because on the original website some cities where not actually cities but could be thought more as regions, we did manually update some geolocations like `West PA, Pennsylvania` (15-20 manually updated).
 
+*Note: For the final map we made some hand cleaning of place names to be more consistent*
+
 ## What to expect <a id="what-to-expect"></a>
 
 The script will create an on-memory geocode cache to try to minimize the hits to the actual Nominatim geocoding service API.
