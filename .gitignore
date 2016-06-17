@@ -1,0 +1,6 @@
+*.py[co]
+exploratory/*
+
+data/*
+!data/.placeholder
+output/*
