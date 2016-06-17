@@ -15,14 +15,16 @@ CACHE_FILE = 'geocoded-cache-nominatim'
 STATE_FILE = 'states-normalized'
 OUTPUT_FILE = 'listings-clean-nominatim'
 HEADER = ["url", "post_id", "title", "listed_date", "price_str", "price_num",
-          "location", "city", "state", "state_ap", "state_usps", "description", "registered", "category",
+          "location", "city", "state", "state_ap", "state_usps",
+          "description", "registered", "category",
           "manufacturer", "caliber", "action", "firearm_type", "party", "img",
           "geo_address", "latitude", "longitude"]
+
 CACHE_HEADER = ["address", "latitude", "longitude"]
 
 # LIMIT CONDITIONS FOR TESTING
 LIMIT = False
-LIMIT_SAMPLE = 5000
+LIMIT_SAMPLE = 50
 
 cache = {}
 states = {}
@@ -68,7 +70,6 @@ def clean(row=None):
         row['state_usps'] = state_norm[1]
     except KeyError:
         print "did not find %s" % (row['state'])
-
 
 
 def format_address(row=None):
@@ -156,7 +157,7 @@ def process_armlist():
             count = 0
             for row in reader:
                 count += 1
-                if count % 500 == 0:
+                if count % 1000 == 0:
                     print "processed %s records" % count
                 if LIMIT and (count >= LIMIT_SAMPLE):
                     break
