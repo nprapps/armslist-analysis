@@ -23,6 +23,7 @@ The following things are assumed to be true in this documentation.
 * You are running OSX.
 * You are using Python 2.7. (Probably the version that came OSX.)
 * You have virtualenv and virtualenvwrapper installed and working.
+* You have postgres installed and running
 
 For more details on the technology stack used with the app-template, see our [development environment blog post](http://blog.apps.npr.org/2013/06/06/how-to-setup-a-developers-environment.html).
 
@@ -62,6 +63,8 @@ Run the script to clean and geocode the data:
 ./clean.py
 ```
 
+*Note: The current dataset supplied is about 80000 records so it can take some time to clean and geocode, patience is a virtue...or so they say*
+
 Sometimes the geocoding service is not accesible so we always cache and persist the geocoded locations not to repeat ourselves `data/geocoded-cache-nominatim.csv`
 
 Because on the original website some cities where not actually cities but could be thought more as regions, we did manually update some geolocations like `West PA, Pennsylvania` (15-20 manually updated).
@@ -79,6 +82,13 @@ Running script will make two csv files:
 
 ## Import to DB and summarize <a id="db-analysis"></a>
 
+Start your postgres server in case you have forgotten, if you have followed our development environment setup then:
+
+```
+$ pgup
+```
+
+
 We created a script to insert the cleaned data into a Postgres database for further analysis
 
 ```
@@ -90,3 +100,6 @@ After the script has successfully created the database tables, we can run the sc
 ```
 ./process.sh
 ```
+
+Running this script will create an output folder with all the csvs that we have used for our analysis.
+
